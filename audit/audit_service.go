@@ -19,6 +19,14 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+type SessionLog struct {
+	ID        uint      `gorm:"primaryKey"`
+	Username  string    `json:"username"`
+	ServerIP  string    `json:"server_ip"`
+	StartTime time.Time `json:"start_time"`
+	EndTime   time.Time `json:"end_time"`
+	LogFile   string    `json:"log_file"`
+}
 
 type AuditEvent struct {
 	SessionID    string `json:"session_id"`
@@ -41,6 +49,7 @@ var (
 func main() {
 	// 1. Initialize Database with Cloud Fallback
 	var err error
+	var db *gorm.DB
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn != "" {
 		fmt.Println("Connecting to Cloud PostgreSQL...")
