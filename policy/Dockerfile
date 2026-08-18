@@ -1,15 +1,16 @@
 # Stage 1: Build the Go binary
 FROM golang:alpine AS builder
-RUN apk add --no-cache git
+# Install git and C compilers required for SQLite
+RUN apk add --no-cache git gcc musl-dev
 WORKDIR /app
 
 # Download dependencies
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the source code and compile
+# Copy the source code and compile with CGO enabled
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o policy_service policy_service.go
+RUN CGO_ENABLED=1 GOOS=linux go build -o policy_service .
 
 # Stage 2: Create the lightweight production image
 FROM alpine:latest
