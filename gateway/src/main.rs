@@ -73,8 +73,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     
     let state = AppState {
         cfg: ProxyConfig {
-            bind_addr: "127.0.0.1:8443".parse().expect("Invalid bind address"),
-            policy_engine_url: "http://127.0.0.1:8080".to_string(),
+            // Updated to use Render's dynamic port and accept public connections
+            bind_addr: format!("0.0.0.0:{}", std::env::var("PORT").unwrap_or_else(|_| "8443".to_string()))
+                .parse()
+                .expect("Invalid bind address"),
+            
+            // Updated to securely grab your Cloud URL with a local laptop fallback
+            policy_engine_url: std::env::var("POLICY_URL").unwrap_or_else(|_| "http://127.0.0.1:8080".to_string()),
+            
             vault_url: "http://127.0.0.1:8200".to_string(),
             vault_token: "root".to_string(),
             tls_ca_cert: "none".to_string(),
