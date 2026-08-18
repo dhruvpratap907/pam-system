@@ -1,4 +1,4 @@
-# Stage 1: Build the Linux binary natively inside a Linux container
+# Stage 1: Build the Rust binary with a temporary swap file for low-RAM builds
 FROM rust:1.72-slim-bullseye AS builder
 WORKDIR /usr/src/gateway
 
@@ -7,8 +7,14 @@ RUN apt-get update && apt-get install -y pkg-config libssl-dev zlib1g-dev build-
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 
-# Compile with release optimizations
-RUN cargo build --release
+# Create a temporary 1GB swap file so cargo build doesn't run out of memory on 512MB RAM
+RUN dd if=/dev/zero of=/swapfile bs=1M count=1024 && \
+    chmod 600 /swapfile && \
+    mkswap /swapfile && \
+    swapon /swapfile && \
+    cargo build --release && \
+    swapoff /swapfile && \
+    rm /swapfile
 
 # Stage 2: Runtime image
 FROM debian:bullseye-slim
@@ -18,7 +24,6 @@ RUN apt-get update && \
     apt-get install -y libssl1.1 ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy from the Linux builder stage (No Windows .exe needed!)
 COPY --from=builder /usr/src/gateway/target/release/gateway .
 
 EXPOSE 8443
