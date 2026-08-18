@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  vault:
+    image: hashicorp/vault:latest
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+
+  opa:
+    image: openpolicyagent/opa:latest
+    ports:
+      - "8181:8181"
+    volumes:
+      - ./policy/pam_policy.rego:/pam_policy.rego
+    command:
+      - "run"
+      - "--server"
+      - "--log-level=debug"
+      - "/pam_policy.rego"

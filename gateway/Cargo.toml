@@ -1,0 +1,27 @@
+[package]
+name = "gateway"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime and networking
+tokio = { version = "1.32", features = ["full"] }
+hyper = { version = "0.14", features = ["full"] }
+
+# JSON serialization/deserialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# HTTP client for talking to Vault and Audit service
+reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
+
+# Logging and time handling
+tracing = "0.1"
+tracing-subscriber = "0.3"
+chrono = "0.4"
+
+# --- NEW WEBSOCKET & SSH DEPENDENCIES ---
+hyper-tungstenite = "0.11"
+tokio-tungstenite = "0.20"
+futures-util = "0.3"
+ssh2 = "0.9"

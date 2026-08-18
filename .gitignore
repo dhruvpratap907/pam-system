@@ -1,0 +1,15 @@
+# Node & React
+pam-ui/node_modules/
+pam-ui/dist/
+
+# Rust
+gateway/target/
+
+# Go & Local Databases
+pam_system.db
+pam_system.db-journal
+audit/worm_audit/
+audit/audit_logs/
+
+# Compiled executables
+*.exe
